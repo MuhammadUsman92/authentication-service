@@ -47,10 +47,11 @@ public class AuthController {
 
     @GetMapping("/")
     public ResponseEntity<ConnValidationResponse> validateGet(HttpServletRequest request) {
-        String username = (String) request.getAttribute("username");
+        String userEmail = (String) request.getAttribute("userEmail");
+        String userName = (String) request.getAttribute("userName");
         String token = (String) request.getAttribute("jwt");
         return ResponseEntity.ok(ConnValidationResponse.builder().status("OK").methodType(HttpMethod.GET.name())
-                .username(username).token(token)
+                .userName(userName).userEmail(userEmail).token(token)
                 .isAuthenticated(true).build());
     }
 
