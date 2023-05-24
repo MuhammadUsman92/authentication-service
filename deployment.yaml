@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentication-service-app
+  labels:
+    app: authentication-service-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentication-service-app
+  template:
+    metadata:
+      labels:
+        app: authentication-service-app
+    spec:
+      containers:
+        - name: authentication-service-app
+          image: gcr.io/PROJECT_ID/IMAGE:TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9191

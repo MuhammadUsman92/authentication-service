@@ -1,0 +1,27 @@
+#server:
+#  port: 9191
+#
+#spring:
+#  application:
+#    name: API-GATEWAY
+##  cloud:
+##    gateway:
+##      routes:
+##        - id: USER-SERVICE
+##          uri: localhost:9999
+##          predicates:
+##            - Path=/users/**
+##          filters:
+##            - name: CircuitBreaker
+##              args:
+##                name: USER-SERVICE
+##                fallbackuri: forward:/userServiceFallBack
+##        - id: DEPARTMENT-SERVICE
+##          uri: lb:
+##          predicates:
+##            - Path=/departments/**
+##          filters:
+##            - name: CircuitBreaker
+##              args:
+##                name: DEPARTMENT-SERVICE
+##                fallbackuri: forward:/departmentServiceFallBack
