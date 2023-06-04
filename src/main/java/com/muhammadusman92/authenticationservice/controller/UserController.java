@@ -20,7 +20,6 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Response> getAllUsers(
 //            @RequestHeader("authorities") String authorities,
                                                   @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) Integer pageNumber,
