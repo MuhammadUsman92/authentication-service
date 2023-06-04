@@ -48,10 +48,10 @@ public class AuthenticationGatewayServiceApplication implements CommandLineRunne
 		try {
 			Role adminRole=new Role();
 			adminRole.setId(AppConstants.ADMIN_USER);
-			adminRole.setName("ROLE_ADMIN");
+			adminRole.setName("ADMIN_USER");
 			Role normalRole=new Role();
 			normalRole.setId(AppConstants.NORMAL_USER);
-			normalRole.setName("ROLE_NORMAL");
+			normalRole.setName("NORMAL_USER");
 			Role rescueUser=new Role();
 			rescueUser.setId(AppConstants.RESCUE_USER);
 			rescueUser.setName("RESCUE_USER");
@@ -64,6 +64,9 @@ public class AuthenticationGatewayServiceApplication implements CommandLineRunne
 			Role policeAdmin=new Role();
 			policeAdmin.setId(AppConstants.POLICE_ADMIN);
 			policeAdmin.setName("POLICE_ADMIN");
+			Role hospitalAdmin=new Role();
+			hospitalAdmin.setId(AppConstants.HOSPITAL_ADMIN);
+			hospitalAdmin.setName("HOSPITAL_ADMIN");
 			List<Role> list=new LinkedList<>();
 			list.add(adminRole);
 			list.add(normalRole);
@@ -71,6 +74,7 @@ public class AuthenticationGatewayServiceApplication implements CommandLineRunne
 			list.add(rescueAdmin);
 			list.add(policeAdmin);
 			list.add(policeUser);
+			list.add(hospitalAdmin);
 			roleRepo.saveAll(list);
 		}catch (Exception e){
 			e.printStackTrace();

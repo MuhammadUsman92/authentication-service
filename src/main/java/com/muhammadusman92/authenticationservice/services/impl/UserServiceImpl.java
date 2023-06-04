@@ -21,11 +21,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
@@ -82,6 +87,84 @@ public class UserServiceImpl implements UserService {
         UserDto userDto = modelMapper.map(findUser, UserDto.class);
         return userDto;
     }
+
+    @Override
+    public UserDto updateUsersRole(Long userId, UpdateRoleRequest updateRoleRequest) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+        // Remove all roles
+        user.getRoles().clear();
+        user.setEmail(updateRoleRequest.getEmail());
+        user.setName(updateRoleRequest.getName());
+        // Update the user's role if provided
+        if (updateRoleRequest.getRoles() != null && !updateRoleRequest.getRoles().isEmpty()) {
+            Set<Role> updatedRoles = updateRoleRequest.getRoles().stream()
+                    .map(roleName -> roleRepo.findByName(roleName)
+                            .orElseThrow(() -> new ResourceNotFoundException("Role", "name", roleName)))
+                    .collect(Collectors.toSet());
+            user.setRoles(updatedRoles);
+            // Check if user has specific roles
+            boolean isAdminUser = user.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("ADMIN_USER"));
+            boolean isRescueAdmin = user.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("RESCUE_ADMIN"));
+            boolean isHospitalAdmin = user.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("HOSPITAL_ADMIN"));
+            boolean isPoliceAdmin = user.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("POLICE_ADMIN"));
+            boolean isRescueUser = user.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("RESCUE_USER"));
+            boolean isNormalUser = user.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("NORMAL_USER"));
+            boolean isPoliceUser = user.getRoles().stream()
+                    .anyMatch(role -> role.getName().equals("POLICE_USER"));
+            if (updateRoleRequest.getHospitalRegNo() != null && isHospitalAdmin) {
+                try {
+                    ResponseEntity<String> response = restTemplate.exchange("/hospitalId/" + updateRoleRequest.getHospitalRegNo() +
+                            "lb://HEALTH-SERVICE/user-email/" + updateRoleRequest.getEmail(), HttpMethod.POST, null, String.class);
+                } catch (Exception e) {
+                    // Handle exceptions
+                    e.printStackTrace();
+                }
+            }
+            // Assign roles based on conditions
+            if (isAdminUser) {
+                Set<Role> allRoles = new HashSet<>(roleRepo.findAll());
+                user.getRoles().addAll(allRoles);
+            } else if (isRescueAdmin) {
+                Set<Role> additionalRoles = roleRepo.findAll().stream()
+                        .filter(role -> role.getName().equals("RESCUE_ADMIN")
+                                || role.getName().equals("HOSPITAL_ADMIN")
+                                || role.getName().equals("RESCUE_USER"))
+                        .collect(Collectors.toSet());
+                user.getRoles().addAll(additionalRoles);
+            } else if (isHospitalAdmin) {
+                Set<Role> additionalRoles = roleRepo.findAll().stream()
+                        .filter(role -> role.getName().equals("HOSPITAL_ADMIN")
+                                || role.getName().equals("RESCUE_USER"))
+                        .collect(Collectors.toSet());
+                user.getRoles().addAll(additionalRoles);
+
+                } else if (isPoliceAdmin) {
+                    Set<Role> additionalRoles = roleRepo.findAll().stream()
+                            .filter(role -> role.getName().equals("POLICE_ADMIN")
+                                    || role.getName().equals("POLICE_USER"))
+                            .collect(Collectors.toSet());
+                    user.getRoles().addAll(additionalRoles);
+                } else if (isRescueUser && isNormalUser && isPoliceUser) {
+                    Set<Role> additionalRoles = roleRepo.findAll().stream()
+                            .filter(role -> role.getName().equals("RESCUE_USER")
+                                    || role.getName().equals("NORMAL_USER")
+                                    || role.getName().equals("POLICE_USER"))
+                            .collect(Collectors.toSet());
+                    user.getRoles().addAll(additionalRoles);
+                }
+            }
+        // Save the updated user
+        User updatedUser = userRepo.save(user);
+        return modelMapper.map(updatedUser, UserDto.class);
+    }
+
 
     @Override
     public PageResponse<UserDto> getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {

@@ -10,6 +10,7 @@ public interface UserService {
     UserDto createUser(RegisterDto registerDto);
     UserDto updateUser(UserDto userDto,Long userId);
     UserDto getUserById(Long userId);
+    UserDto updateUsersRole(Long userId,UpdateRoleRequest updateRoleRequest);
 
     PageResponse<UserDto> getAllUsers(Integer pageNumber, Integer pageSize, String sortBy, String sortDir);
 

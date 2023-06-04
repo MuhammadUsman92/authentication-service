@@ -66,11 +66,15 @@ public class AuthController {
         this.authenticate(loginRequest.getEmail(),loginRequest.getPassword());
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getEmail());
         String generateToken = jwtTokenHelper.generateToken(userDetails);
+        List<String> authorities = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
         return new ResponseEntity<>(Response.builder()
                 .timeStamp(now())
                 .status(OK)
                 .statusCode(OK.value())
                 .token(generateToken)
+                .data(authorities)
                 .build(), OK);
     }
     private void authenticate(String username, String password) {
