@@ -120,8 +120,8 @@ public class UserServiceImpl implements UserService {
                     .anyMatch(role -> role.getName().equals("POLICE_USER"));
             if (updateRoleRequest.getHospitalRegNo() != null && isHospitalAdmin) {
                 try {
-                    ResponseEntity<String> response = restTemplate.exchange("/hospitalId/" + updateRoleRequest.getHospitalRegNo() +
-                            "lb://HEALTH-SERVICE/user-email/" + updateRoleRequest.getEmail(), HttpMethod.POST, null, String.class);
+                    ResponseEntity<String> response = restTemplate.exchange(
+                            "lb://HEALTH-SERVICE/hospital/hospitalId/" + updateRoleRequest.getHospitalRegNo()+"/user-email/" + updateRoleRequest.getEmail() , HttpMethod.POST, null, String.class);
                 } catch (Exception e) {
                     // Handle exceptions
                     e.printStackTrace();
