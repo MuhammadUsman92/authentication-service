@@ -45,22 +45,20 @@ public class UserController {
                     .build(), FORBIDDEN);
         }
     }
-
     @PutMapping("/userId/{userId}")
     public ResponseEntity<Response> updateUsersRole(
             @RequestHeader("authorities") String authorities,
             @RequestBody UpdateRoleRequest updateRoleRequest,
-            @PathVariable Long userId
-    ){
-       if (authorities.contains("ADMIN_USER")) {
-        UserDto userDto1 = userService.updateUsersRole(userId,updateRoleRequest);
-        return new  ResponseEntity<>(Response.builder()
-                .timeStamp(now())
-                .message("All Users are successfully get")
-                .status(OK)
-                .statusCode(OK.value())
-                .data(userDto1)
-                .build(),OK);
+            @PathVariable Long userId) {
+        if (authorities.contains("ADMIN_USER")) {
+            UserDto userDto1 = userService.updateUsersRole(userId, updateRoleRequest);
+            return new ResponseEntity<>(Response.builder()
+                    .timeStamp(now())
+                    .message("All Users are successfully get")
+                    .status(OK)
+                    .statusCode(OK.value())
+                    .data(userDto1)
+                    .build(), OK);
         } else {
             return new ResponseEntity<>(Response.builder()
                     .timeStamp(now())
@@ -69,6 +67,20 @@ public class UserController {
                     .statusCode(FORBIDDEN.value())
                     .build(), FORBIDDEN);
         }
+    }
+        @PutMapping("/userEmail/{email}")
+        public ResponseEntity<Response> updateUser(
+                @RequestHeader("authorities") String authorities,
+                @RequestBody UserDto userDto,
+                @PathVariable String email){
+        UserDto userDto1 = userService.updateUser(userDto,email);
+        return new  ResponseEntity<>(Response.builder()
+                .timeStamp(now())
+                .message("All Users are successfully get")
+                .status(OK)
+                .statusCode(OK.value())
+                .data(userDto1)
+                .build(),OK);
     }
 
 }

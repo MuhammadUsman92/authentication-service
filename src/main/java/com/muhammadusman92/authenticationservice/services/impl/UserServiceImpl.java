@@ -68,15 +68,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto, Long userId) {
-        User findUser = userRepo.findById(userId)
-                .orElseThrow(()->new ResourceNotFoundException("User","Id",userId));
+    public UserDto updateUser(UserDto userDto, String email) {
+        User findUser = userRepo.findByemail(email)
+                .orElseThrow(()->new ResourceNotFoundException("User","email",email));
         User user = modelMapper.map(userDto, User.class);
-        user.setId(findUser.getId());
-        user.setRoles(findUser.getRoles());
-        user.setEmail(findUser.getEmail());
-        user.setPassword(findUser.getPassword());
-        User savedUser = userRepo.save(user);
+        findUser.setName(user.getName());
+        findUser.setAccountNonExpired(true);
+        findUser.setAccountNonLocked(true);
+        findUser.setCredentialsNonExpired(true);
+        findUser.setEnabled(true);
+        findUser.setImageAddress(user.getImageAddress());
+        User savedUser = userRepo.save(findUser);
         return modelMapper.map(savedUser,UserDto.class);
     }
 
@@ -192,14 +194,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByEmail(String email) {
-        User findUser = userRepo.findByEmail(email)
+        User findUser = userRepo.findByemail(email)
                 .orElseThrow(()->new ResourceNotFoundException("User","Id",email));
         return modelMapper.map(findUser,UserDto.class);
     }
 
     @Override
     public void updatePasswordRequest(String email) {
-        User findUser = userRepo.findByEmail(email)
+        User findUser = userRepo.findByemail(email)
                 .orElseThrow(()->new ResourceNotFoundException("User","Id",email));
         OtpDetails otpDetails = otpUtils.generateOtp(findUser.getEmail());
         String to = "usmankhokhar0222@gmail.com";
@@ -211,7 +213,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean updatePassword(UpdatePasswordDto updatePasswordDto) {
         if(validateOtp(updatePasswordDto.getEmail(),updatePasswordDto.getOtpCode())){
-            User findUser = userRepo.findByEmail(updatePasswordDto.getEmail())
+            User findUser = userRepo.findByemail(updatePasswordDto.getEmail())
                     .orElseThrow(()->new ResourceNotFoundException("User","Id",updatePasswordDto.getEmail()));
             findUser.setPassword(passwordEncoder.encode(updatePasswordDto.getPassword()));
             userRepo.save(findUser);
@@ -222,7 +224,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUserImage(String email, String imageAddress) {
-        User findUser = userRepo.findByEmail(email)
+        User findUser = userRepo.findByemail(email)
                 .orElseThrow(()->new ResourceNotFoundException("User","Id",email));
         findUser.setImageAddress(imageAddress);
         return modelMapper.map(userRepo.save(findUser),UserDto.class);

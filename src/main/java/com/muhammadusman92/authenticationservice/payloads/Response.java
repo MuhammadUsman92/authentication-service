@@ -19,5 +19,8 @@ public class Response<T> {
     private String token;
     private String error;
     private String message;
+    private String userEmail;
+    private String userName;
+    private String userImageAddress;
     private T data;
 }

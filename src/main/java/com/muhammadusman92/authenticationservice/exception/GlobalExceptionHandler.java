@@ -6,11 +6,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import static java.time.LocalDateTime.now;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Response> resourceNotFoundExceptionHandler(ResourceNotFoundException ex){
+        return new ResponseEntity<>(Response.builder()
+                .timeStamp(now())
+                .status(NOT_FOUND)
+                .statusCode(NOT_FOUND.value())
+                .message(ex.getMessage())
+                .build(), NOT_FOUND);
+    }
     @ExceptionHandler(BadCredentialsExceptionCustom.class)
     public ResponseEntity<Response> resourceNotFoundExceptionHandler(BadCredentialsExceptionCustom ex){
         return new ResponseEntity<>(Response.builder()

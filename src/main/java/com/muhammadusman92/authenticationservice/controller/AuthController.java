@@ -49,8 +49,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private UserService userService;
-    @Autowired
-    private FileService fileService;
+
 
     @GetMapping("/")
     public ResponseEntity<ConnValidationResponse> validateGet(HttpServletRequest request) {
@@ -69,12 +68,16 @@ public class AuthController {
         List<String> authorities = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
+        UserDto findUser = this.userService.findByEmail(loginRequest.getEmail());
         return new ResponseEntity<>(Response.builder()
                 .timeStamp(now())
                 .status(OK)
                 .statusCode(OK.value())
                 .token(generateToken)
                 .data(authorities)
+                .userImageAddress(findUser.getImageAddress())
+                .userEmail(loginRequest.getEmail())
+                .userName(findUser.getName())
                 .build(), OK);
     }
     private void authenticate(String username, String password) {
@@ -130,33 +133,5 @@ public class AuthController {
                 .message("Password cannot be update")
                 .build(), BAD_REQUEST);
     }
-    @PostMapping("/file/upload/")
-    public ResponseEntity<Response> uploadFile(
-            @RequestParam("file") MultipartFile file,
-            HttpServletRequest request
-    ) throws IOException {
-        String userEmail = (String) request.getAttribute("userEmail");
-        String fileName = this.fileService.uploadFile(path, file);
-        UserDto userDto = userService.updateUserImage(userEmail, fileName);
-        return new ResponseEntity<>(Response.builder()
-                .timeStamp(now())
-                .status(OK)
-                .statusCode(OK.value())
-                .message("File uploaded successfully")
-                .data(userDto)
-                .build(), OK);
-    }
-
-    @GetMapping(value = "/file/{fileName}")
-    public void downloadFile(
-            @PathVariable String fileName,
-            HttpServletResponse response
-    ) throws IOException {
-        InputStream resource = this.fileService.getResource(path, fileName);
-        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
-        StreamUtils.copy(resource, response.getOutputStream());
-    }
-
 
 }
