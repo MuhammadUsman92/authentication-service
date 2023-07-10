@@ -8,9 +8,6 @@ public class AppConstants {
     public static final Long RESCUE_ADMIN = 505l;
     public static final Long POLICE_ADMIN = 506l;
     public static final Long HOSPITAL_ADMIN = 507l;
-
-
-
     public static final String PAGE_NUMBER="0";
     public static final String PAGE_SIZE="10";
     public static final String SORT_BY="id";
