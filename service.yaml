@@ -5,6 +5,6 @@ metadata:
 spec:
   ports:
     - targetPort: 9191
-      port: 80
+      port: 9191
   selector:
     app: authentication-service-app
