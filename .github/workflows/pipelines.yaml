@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: ${{secrets.GKE_PROJECT}}
-  GKE_CLUSTER: cluster-1    # TODO: update to cluster name
+  GKE_CLUSTER: cluster-2    # TODO: update to cluster name
   GKE_ZONE: us-central1-c   # TODO: update to cluster zone
   DEPLOYMENT_NAME: authentication-service-app
   IMAGE: authentication-service-app-image
@@ -45,7 +45,7 @@ jobs:
       - name: Get GKE Credentials
         uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
         with:
-          cluster_name: "cluster-1"
+          cluster_name: "cluster-2"
           location: "us-central1-c"
           credentials: ${{ secrets.GKE_SA_KEY }}
 
